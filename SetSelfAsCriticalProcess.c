@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <windows.h>
 
-bool EnableDebugPrivilege();
-bool TestCriticalApi();
+BOOL EnableDebugPrivilege();
+BOOL TestCriticalApi();
 typedef NTSTATUS(__cdecl *RTLSETPROCESSISCRITICAL)(IN BOOLEAN NewValue,OUT PBOOLEAN OldValue OPTIONAL,IN BOOLEAN NeedBreaks);
 
 int main(void)
@@ -11,19 +11,19 @@ int main(void)
     return 0;
 }
 
-bool EnableDebugPrivilege()
+BOOL EnableDebugPrivilege()
 {
     HANDLE hToken = NULL;
     LUID debugPrivilegeValueLuid={0};
     TOKEN_PRIVILEGES tokenPrivilege = {0};
 
     if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
-        return false;
+        return FALSE;
 
     if (!LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &debugPrivilegeValueLuid))
     {
         CloseHandle(hToken);
-        return false;
+        return FALSE;
     }
 
     tokenPrivilege.PrivilegeCount = 1;
@@ -32,25 +32,25 @@ bool EnableDebugPrivilege()
     if (!AdjustTokenPrivileges(hToken, FALSE, &tokenPrivilege, sizeof(tokenPrivilege), NULL, NULL))
     {
         CloseHandle(hToken);
-        return false;
+        return FALSE;
     }
 
-    return true;
+    return TRUE;
 }
 
-bool TestCriticalApi()
+BOOL TestCriticalApi()
 {
     if(!EnableDebugPrivilege())
-        return false;
+        return FALSE;
 
     HMODULE  hNtdllMod = GetModuleHandle(TEXT("ntdll.dll"));
     if(!hNtdllMod)
-        return false;
+        return FALSE;
 
     RTLSETPROCESSISCRITICAL RtlSetProcessIsCritical;
     RtlSetProcessIsCritical = (RTLSETPROCESSISCRITICAL)GetProcAddress(hNtdllMod, "RtlSetProcessIsCritical");
     if (!RtlSetProcessIsCritical)
-        return false;
+        return FALSE;
 
     NTSTATUS status = RtlSetProcessIsCritical(TRUE, NULL, FALSE);
     printf("status:%x\n",status);
@@ -61,5 +61,5 @@ bool TestCriticalApi()
     printf("status:%x\n",status);
     getchar();
 
-    return true;
+    return TRUE;
 }
