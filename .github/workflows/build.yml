@@ -23,10 +23,13 @@ jobs:
       - name: Compile
         run: |
           cl /nologo /W4 /MT SetSelfAsCriticalProcess.c advapi32.lib /Fe:SetSelfAsCriticalProcess.exe
+          cl /nologo /W4 /MT NtRaiseHardError.c /Fe:NtRaiseHardError.exe
         shell: cmd
 
-      - name: Upload artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: SetSelfAsCriticalProcess
-          path: SetSelfAsCriticalProcess.exe
+          name: compiled-exes
+          path: |
+            SetSelfAsCriticalProcess.exe
+            NtRaiseHardError.exe
