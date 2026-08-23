@@ -1,0 +1,32 @@
+name: Build Windows Critical API Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC Developer CMD
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Compile
+        run: |
+          cl /nologo /W4 /MT SetSelfAsCriticalProcess.c advapi32.lib /Fe:SetSelfAsCriticalProcess.exe
+        shell: cmd
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SetSelfAsCriticalProcess
+          path: SetSelfAsCriticalProcess.exe
