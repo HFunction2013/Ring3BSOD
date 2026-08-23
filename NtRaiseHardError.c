@@ -56,7 +56,7 @@ int main()
 {
     // 任何进程都会自动加载ntdll，因此直接获取模块地址即可，不必再LoadLibrary
     HMODULE  NtBase = GetModuleHandle(TEXT("ntdll.dll"));
-    if (!NtBase) return false;
+    if (!NtBase) return FALSE;
 
     // 获取各函数地址
     NtRaiseHardError = (NTRAISEHARDERROR)GetProcAddress(NtBase, "NtRaiseHardError");
